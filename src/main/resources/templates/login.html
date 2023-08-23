@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="css/lib/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+	<script src="js/lib/bootstrap.min.js"></script>
+	<script src="js/lib/jquery.min.js"></script>
+	<script src="js/lib/popper.min.js"></script>
+	<script>
+
+		$(document).ready(function () {
+
+			$(function () {
+				$("#header").load("header.html");
+			});
+			if (localStorage.getItem("userId") !== "" && localStorage.getItem("userId") !== null
+				&& localStorage.getItem("userId") !== undefined) {
+				window.location.replace("/users");
+			}
+
+
+
+
+		});
+		function loginClick() {
+			var data = {}
+			data["email"] = $("#username").val();
+			data["password"] = $("#password").val();
+			if (data["email"] == null || data["email"] == undefined || data["email"] == "" || data["email"].trim() == "" ||
+				data["password"] == null || data["password"] == undefined || data["password"] == "" || data["password"].trim() == "") {
+					jQuery.noConflict();
+					$("#errorAlert").children('.modal-dialog').children('.modal-content').children('span').html("<p style='font-size:20px;color:red'>Fields Cannot be blank!</p>");
+					$("#errorAlert").appendTo("body").modal('show');
+				return false;
+			}
+			
+			/* if(data["email"] == "admin" && data["password"] == "admin" ){
+				localStorage.setItem("username", "admin");
+				localStorage.setItem("email", "admin@gmail.com");
+				localStorage.setItem("userId", 777);
+				localStorage.setItem("role", "admin");
+				//	window.location.replace("/");
+				window.location.href = "/home.html";
+			} else {
+				$(".message").empty();
+				$(".message").append("Invalid credentials");
+				localStorage.setItem("userId", "");
+				localStorage.setItem("username", "");
+				localStorage.setItem("email", "");
+				localStorage.setItem("role", "");
+			} */
+			$.ajax({
+				type: "post",
+				data: JSON.stringify(data),
+				url: "http://localhost:8080/api/auth/signin",
+				contentType: 'application/json',
+				success: function (data) {
+					console.log(data);
+					localStorage.setItem("firstname", data.firstName);
+                    localStorage.setItem("lastname", data.lastName);
+                    localStorage.setItem("email", data.email);
+                    localStorage.setItem("phone", data.phone);
+                    localStorage.setItem("userId", data.id);
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("role", data.role);
+					//	window.location.replace("/");
+					window.location.href = "/users";
+				}, error: function (err) {
+					console.log(err);
+					$(".message").empty();
+					$(".message").append(err.responseJSON.message);
+					
+					$(".error").attr("style", "display:block;");
+					localStorage.setItem("userId", "");
+					localStorage.setItem("username", "");
+					localStorage.setItem("email", "");
+					localStorage.setItem("role", "");
+
+				} 
+			});
+		}
+	</script>
+</head>
+
+<body>
+
+	<!--Navbar-->
+	<div id="header"></div>
+
+	<div class="container" style="padding-bottom:25px;">
+		<div class="row">
+
+			<div class=" col-md-6 " style="margin-top: 80px;">
+				<img src="../img/login.png" style="width:350px;height:350px" alt=""></img><br>
+			</div>
+			<div class="card col-md-6 mx-auto" style=" margin-top: 80px; background-color: aqua;">
+				<div class="error" style="display:none;">
+					<div class="alert alert-danger message"> Invalid credentials</div>
+				</div>
+				<div class="card-body">
+					<h4 class="card-title">Login:</h4>
+					<div class="form-group">
+						<label class="control-label" for="username">Email</label>
+						<input id="username" type="text" class="form-control" required autofocus="autofocus" />
+					</div>
+
+					<div class="form-group">
+						<label class="control-label" for="password">Password</label>
+						<input id="password" type="password" class="form-control" required autofocus="autofocus" />
+					</div>
+
+					<button type="submit" onclick="loginClick();" class="btn btn-primary">Login</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal" id="errorAlert" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+		  <div class="modal-content" style="text-align: center;padding:10px; background-color: bisque;">
+			<i class="fa fa-times-circle  fa-5x" aria-hidden="true" style="color: red;"></i><br>
+			<span id="errorMsg"></span><br>
+			<button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
+		  </div>
+		</div>
+	  </div>
+
+</body>
+
+</html>
